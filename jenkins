@@ -1,0 +1,56 @@
+pipeline {
+
+    agent any
+
+    tools {
+        terraform 'terraform'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/bonkuricharanrajcloud-png/techie_horizon-21.git'
+            }
+        }
+
+        stage('Check Terraform Files') {
+            steps {
+                sh '''
+                    echo "Current directory:"
+                    pwd
+
+                    echo "Terraform files:"
+                    ls -la *.tf
+                '''
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                input message: 'Do you want to apply Terraform?', ok: 'Apply'
+
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+}
